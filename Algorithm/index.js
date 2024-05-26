@@ -11,7 +11,7 @@ const exportModels = {
 const typesFunction = require('./jsonToGraphQLTypes');
 const resolversFunction = require('./jsonToResolvers');
 const findSchemas = require('./findSchemas'); 
-const { convertSchema, convertType } = require('./mongooseToJSON')
+const { convertSchemas, convertType } = require('./mongooseToJSON')
 
 //
 let configFilePath = findSchemas(); 
@@ -24,7 +24,11 @@ if (configFilePath) {
 }
 
 //parse the mongo schema and convert it into a JSON object
-let parsedMongoSchema = convertSchema(); 
+let parsedMongoSchema = convertSchemas(); 
+console.log(parsedMongoSchema)
+// console.log('Output of convertSchema: ')
+// console.log(JSON.stringify(parsedMongoSchema))
+// console.log('End output of convertSchema: ')
 // Generate GraphQL types and resolvers based on parsed schema
 const graphQLTypes = typesFunction(parsedMongoSchema);
 const graphQLResolvers = resolversFunction(parsedMongoSchema, schemas);

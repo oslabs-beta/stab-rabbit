@@ -1,38 +1,43 @@
-const { GraphQLScalarType, Kind, GraphQLError } = require('graphql');
+const { GraphQLScalarType, Kind } = require('graphql');
 
 const ApolloMaticBufferScalar = new GraphQLScalarType({
   name: 'ApolloMaticBufferScalar',
-  description: 'A custom scalar type for handling Buffer data type.',
-  serialize(value) {
+  description: 'A custom scalar for representing buffer values in Apollomatic applications',
 
-    // Convert Buffer value to a string in base 64. This can be transmitted much more efficiently
+  serialize(value) {
+    if (!Buffer.isBuffer(value)) {
+      throw new TypeError('ApolloMaticBufferScalar can only serialize Buffer objects');
+    }
+    // Convert Buffer to base64 string for serialization
     return value.toString('base64');
   },
+
   parseValue(value) {
-    //After the server receives the value, it needs to convert it to a Buffer object.
-    return Buffer.from(value);
-  },
-  parseLiteral(ast) {
-    //if the query/mutation is made with a literal value, then parseLiteral will be invoked on the AST node that isof this type scalar. The literal 
-    //value is used to create a buffer object, to be used by 
-    if (ast.kind === Kind.STRING) {
-      return Buffer.from(ast.value, 'base64');
+    if (typeof value !== 'string') {
+      throw new TypeError('ApolloMaticBufferScalar can only parse string values');
     }
-    return null; // will return null if the ast.kind is not a string
+    // Parse base64 string back to Buffer
+    return Buffer.from(value, 'base64');
   },
+
+  parseLiteral(ast) {
+    if (ast.kind !== Kind.STRING) {
+      throw new TypeError('ApolloMaticBufferScalar can only parse string literals');
+    }
+    // Parse base64 string back to Buffer
+    return Buffer.from(ast.value, 'base64');
+  }
 });
 
 module.exports = ApolloMaticBufferScalar;
 
 
-//Add to documentation:
-/*
-  Server side:
+// Custom scalar type for representing buffer values in Apollomatic applications.
 
-  Client side:
-    Once the user receives a stringified object from the request and they want to access this data they will have to...
-      1. Use the JSON.parse function on the stringified object in order to convert the data from a string to a javascript object. 
-      2. Use the atob() function in order to convert the ASCII base64 string back to binary.
-      
+// Note for Clients:
 
-*/
+// - When sending Buffer values to the server in GraphQL mutations, ensure that the value is represented as a string in base64 format to ensure compatibility
+//  and avoid data loss.
+  
+// - When receiving Buffer values in GraphQL query responses, expect the values to be represented as strings in base64 format. Clients may need to parse these 
+// strings back to Buffer objects for further manipulation or use.

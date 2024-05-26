@@ -1,23 +1,43 @@
 const { GraphQLScalarType, Kind } = require('graphql');
 
-const ApolloMaticDateScalar = new GraphQLScalarType({
-  //Note that the ast that is contructed by the GraphQL query can tell that a node is a variable or a literal by their structure. Variables are an object with a name and value property and literals only have the value property.
-  name: 'ApolloMaticDateScalar',
-  description: 'Custom scalar for handling dates in ApolloMatic',
+const ApollomaticDateScalar = new GraphQLScalarType({
+  name: 'ApollomaticDateScalar',
+  description: 'A custom scalar for representing date values in Apollomatic applications',
+
   serialize(value) {
-    //Convert date to String to be sent back to the client.
+    if (!(value instanceof Date)) {
+      throw new TypeError('ApollomaticDateScalar can only serialize Date objects');
+    }
+    // Assuming ISO string format for serialization
     return value.toISOString();
   },
+
   parseValue(value) {
-    return new Date(value);//coverts
-  },
-  //When the AST is being traversed, if this scalar type is found and the value is a literal, this functionality will be run.
-  parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) { //checks if the value is a string
-      return new Date(ast.value);//converts the string to a Date object,
+    if (typeof value !== 'string') {
+      throw new TypeError('ApollomaticDateScalar can only parse string values');
     }
-    return null;
+    // Parsing ISO string format
+    return new Date(value);
   },
+
+  parseLiteral(ast) {
+    if (ast.kind !== Kind.STRING) {
+      throw new TypeError('ApollomaticDateScalar can only parse string literals');
+    }
+    // Parsing ISO string format
+    return new Date(ast.value);
+  }
 });
 
-module.exports = ApolloMaticDateScalar;
+module.exports = ApollomaticDateScalar;
+
+
+// Custom scalar type for representing date values in Apollomatic applications.
+
+// Note for Clients:
+
+// - When sending Date values to the server in GraphQL mutations, ensure that the value is 
+// represented as a string in ISO 8601 format (e.g., "YYYY-MM-DDTHH:mm:ss.sssZ") to ensure compatibility and avoid ambiguity.
+  
+// - When receiving Date values in GraphQL query responses, expect the values to be represented as strings in ISO 8601 format. 
+// Clients may need to parse these strings back to Date objects for further manipulation or display.

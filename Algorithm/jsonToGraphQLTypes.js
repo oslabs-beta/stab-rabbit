@@ -1,16 +1,18 @@
 const jsonToGraphQLTypes = (jsonObj) => {
   
-  const customScalars = 'scalar ApolloMaticDateScalar\nscalar ApolloMaticBufferScalar\nscalar ApolloMaticMixedScalar\nscalar ApolloMaticMapScalar\n\n';
+  const customScalars = 'scalar ApolloMaticDateScalar\nscalar ApolloMaticBufferScalar\nscalar ApolloMaticMixedScalar\nscalar ApolloMaticMapScalar\nscalar ApolloMaticBigIntScalar\nscalar ApolloMaticDecimal128Scalar\n\n';
   let customScalarRequires = '\nconst ApolloMaticDateScalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticDateScalar.js\');'
   customScalarRequires +='\nconst ApolloMaticBufferScalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticBufferScalar.js\');'
   customScalarRequires +='\nconst ApolloMaticMixedScalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticMixedScalar.js\');'
   customScalarRequires +='\nconst ApolloMaticMapScalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticMapScalar.js\');'
+  customScalarRequires +='\nconst ApolloMaticBigIntScalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticBigIntScalar.js\');'
+  customScalarRequires +='\nconst ApolloMaticDecimal128Scalar = require(\'../node_modules/apollomatic/CustomScalars/ApolloMaticDecimal128Scalar.js\');'
   
   let typeQuery = 'type Query {\n';
   let typeMutation = 'type Mutation {\n';
   let typeDefs = '';
   let typeInputs = '';
-  
+
   jsonObj.models.forEach((model) => {
       const typeName = model.name;
       let typeDef = `type ${typeName} {\n  id: ID!\n`;
@@ -63,6 +65,6 @@ const jsonToGraphQLTypes = (jsonObj) => {
   typeMutation += '}\n\n';
 
   // return `const typeDefs = gql\` \n${typeQuery} ${typeMutation} ${typeDefs}\``;
-  return `const { gql } = require('apollo-server-express');${customScalarRequires}\n\nexport const typeDefs = gql\` \n${customScalars} ${typeDefs} ${typeInputs} ${typeQuery} ${typeMutation}\``;
+  return `const { gql } = require('apollo-server-express');${customScalarRequires}\n\nconst typeDefs = gql\` \n${customScalars} ${typeDefs} ${typeInputs} ${typeQuery} ${typeMutation}\` \n\nmodule.exports = typeDefs;`;
 };
 module.exports = jsonToGraphQLTypes;
