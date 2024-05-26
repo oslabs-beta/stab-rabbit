@@ -19,8 +19,8 @@ const jsonToGraphQLTypes = (jsonObj) => {
       let typeInput = `input ${typeName}Input {\n`;
 
       // Generate Query Type Definitions
-      typeQuery += `  ${typeName.toLowerCase()}(id: ID!): ${typeName}\n`;
-      typeQuery += `  ${typeName.toLowerCase()}s: [${typeName}]\n`;
+      typeQuery += `  get${typeName}(id: ID!): ${typeName}\n`;
+      typeQuery += `  get${typeName}s: [${typeName}]\n`;
 
       // Generate Mutation Type Definitions
       typeMutation += `  create${typeName}(input: ${typeName}Input!): ${typeName}\n`;

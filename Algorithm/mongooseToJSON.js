@@ -17,7 +17,7 @@ function convertSchemas(){
         const nestedFields = {};
         //iterate over each field in this model
         for(const field in paths){
-          if(field != '__v'){
+          if(field != '__v' && field != '_id'){
             let resolved = false;
             const convertedType = convertField(field, paths, currentSchema);
             console.log(convertedType)
